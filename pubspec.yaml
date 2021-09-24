@@ -32,6 +32,13 @@ dependencies:
   sn_progress_dialog: ^1.0.3
   youtube_player_flutter: ^8.0.0
   flutter_youtube_downloader: ^0.0.5
+  get: any
+
+  filter_list: any
+  shared_preferences: ^2.0.7
+  get_storage: ^2.0.3
+
+
 
 
 dev_dependencies:

@@ -4,6 +4,7 @@ class Constants{
   static const String English= 'English';
   static const String Marathi= 'Marathi';
   static const String Telugu= 'Telugu';
+  static const String FILEPATH= 'filePath';
 
   static const List<String> choices = <String>[
     Hindi,
@@ -11,6 +12,8 @@ class Constants{
     Marathi,
     Telugu
   ];
+
+
 
 
 }
