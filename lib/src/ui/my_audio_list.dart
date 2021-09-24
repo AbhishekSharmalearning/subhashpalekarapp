@@ -2,12 +2,17 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:path_provider/path_provider.dart' as p;
-import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:subhashpalekarapp/src/ui/custom_list_tile.dart';
+import 'package:subhashpalekarapp/utils/Constants.dart';
+import 'dart:io' as io;
 
 class MyAudioList extends StatefulWidget {
-  const MyAudioList({Key? key}) : super(key: key);
+
+  final String choiceValue;
+
+  const MyAudioList({Key? key, required this.choiceValue}) : super(key: key);
 
   @override
   _MyAudioListState createState() => _MyAudioListState();
@@ -20,46 +25,59 @@ class _MyAudioListState extends State<MyAudioList> {
       'title' : 'Tech House vibes',
       'Singer' : 'by Alejandro Magaña (A. M.)',
       'url' :'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3',
-      'coverurl':'https://i.ytimg.com/vi/v1wqdV_IZyU/maxresdefault.jpg'
+      'coverurl':'https://i.ytimg.com/vi/v1wqdV_IZyU/maxresdefault.jpg',
+      'language':'English'
     },
     {
       'title' : 'Hazy After Hours',
       'Singer' : 'by Lily J',
       'url' :'https://assets.mixkit.co/music/preview/mixkit-hazy-after-hours-132.mp3',
-      'coverurl':'https://i.ytimg.com/vi/NqvmITu9i5k/maxresdefault.jpg'
+      'coverurl':'https://i.ytimg.com/vi/NqvmITu9i5k/maxresdefault.jpg',
+      'language':'English'
     },
     {
       'title' : 'A Very Happy Christmas',
       'Singer' : 'by Michael Ramir C.',
       'url' :'https://assets.mixkit.co/music/preview/mixkit-a-very-happy-christmas-897.mp3',
-      'coverurl':'https://i.ytimg.com/vi/HGaf0BAC1hI/hqdefault.jpg'
+      'coverurl':'https://i.ytimg.com/vi/HGaf0BAC1hI/hqdefault.jpg',
+      'language':'Hindi'
     },
     {
       'title' : 'Complicated',
       'Singer' : 'by Arulo',
       'url' :'https://assets.mixkit.co/music/preview/mixkit-complicated-281.mp3',
-      'coverurl':'https://i.ytimg.com/vi/kO-vqyASXAM/maxresdefault.jpg'
+      'coverurl':'https://i.ytimg.com/vi/kO-vqyASXAM/maxresdefault.jpg',
+      'language':'Marathi'
     }
   ];
 
 
   //setting the player UI data
+  //SharedPreferences prefs = SharedPreferences.getInstance() as SharedPreferences;
   String currentTitle = "";
   String currentCover = "";
   String currentSinger = "";
   String currentSong = "";
   String _fileFullPath = "";
+  String _filePath = "";
   IconData iconData = Icons.play_arrow;
   bool isLoading = false;
   bool isVisible = false;
   late Dio dio ;
   int progress = 0;
+  List filterList =[];
+  late final file;
+  final datacount = GetStorage();
+
+
 
   AudioPlayer audioPlayer = new AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
   bool isPlaying = false;
 
+
   Duration duration = new Duration();
   Duration position = new Duration();
+
 
   void playMusic(String url) async{
 
@@ -105,6 +123,8 @@ class _MyAudioListState extends State<MyAudioList> {
     dio = Dio();
   }
 
+
+
   Future<List<Directory>?> _getExternalStoragePath(){
     return p.getExternalStorageDirectories(type: p.StorageDirectory.music);
   }
@@ -114,9 +134,15 @@ class _MyAudioListState extends State<MyAudioList> {
     await pd.show(max: 100, msg: 'Downloading....');*/
 
     try{
+
       final dirList = await _getExternalStoragePath();
       final path = dirList![0].path;
-      final file =  File('$path/$fileName');
+
+      // prefs = await SharedPreferences.getInstance();
+     // addStringToSF(path);
+      datacount.write(Constants.FILEPATH, path);
+      file =  File('$path/$fileName');
+      print('File is : $file');
       await dio.download(urlPath, file.path,
        onReceiveProgress: (rec, total){
           setState(() {
@@ -142,30 +168,59 @@ class _MyAudioListState extends State<MyAudioList> {
   }
 
 
+
+  bool isExist(int index){
+    return File(datacount.read(Constants.FILEPATH)!=null ?  datacount.read(Constants.FILEPATH) + "/" + filterList[index]['title'] + ".mp3" : "").existsSync();
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
+
+
+    setState(() {
+      filterList.clear();
+      if(widget.choiceValue.isNotEmpty) {
+        filterList.addAll(
+            musicList.where((e) => e['language'] == widget.choiceValue)
+                .toList());
+      }else{
+        filterList.addAll(musicList);
+      }
+    });
     return Scaffold(
       body: Column(
         children: [
           Expanded(
-              child: ListView.builder(
-                itemCount: musicList.length,
+            child: ListView.builder(
+              itemCount: filterList.length,
                   itemBuilder: (context, index) => customListTile(
                     onTap: () {
                       setState(() {
-                        playMusic(musicList[index]['url']);
-                        currentTitle = musicList[index]['title'];
-                        currentCover = musicList[index]['coverurl'];
-                        currentSinger = musicList[index]['Singer'];
+                        if(isExist(index)){
+                          playMusic(datacount.read(Constants.FILEPATH) + "/" + filterList[index]['title'] + ".mp3");
+                          currentTitle = filterList[index]['title'];
+                          currentCover = filterList[index]['coverurl'];
+                          currentSinger = filterList[index]['Singer'];
+                        }else{
+                          playMusic(filterList[index]['url']);
+                          currentTitle = filterList[index]['title'];
+                          currentCover = filterList[index]['coverurl'];
+                          currentSinger = filterList[index]['Singer'];
+                        }
+
                       });
                     },
                     onPressed: (){
-                      _downloadAndSaveFileToStorage(musicList[index]['url'], musicList[index]['title']+'.mp3');
+                      _downloadAndSaveFileToStorage(filterList[index]['url'], filterList[index]['title']+'.mp3');
                     },
-                      title:  musicList[index]['title'],
-                      singer: musicList[index]['Singer'],
-                      cover: musicList[index]['coverurl'],
-
+                      title:  filterList[index]['title'],
+                      singer: filterList[index]['Singer'],
+                      cover: filterList[index]['coverurl'],
+                      filePath : isExist(index) ,
                   ),
               ),
 
@@ -261,4 +316,8 @@ class _MyAudioListState extends State<MyAudioList> {
       ),
     );
   }
+
+
+
+
 }

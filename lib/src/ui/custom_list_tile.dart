@@ -4,8 +4,12 @@ import 'package:flutter/rendering.dart';
 
 
 Widget customListTile({required String title, required String  singer,
-  required String cover, onTap,onPressed}
+  required String cover, onTap,onPressed,required bool filePath }
 ){
+
+  bool isVisible = filePath;
+
+
   return InkWell(
     onTap: onTap,
     child: Container(
@@ -43,11 +47,14 @@ Widget customListTile({required String title, required String  singer,
               ],
             ),
             new Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(right: 10.0),
-              child: IconButton(
-                icon: Icon(Icons.download),
-                onPressed: onPressed
+            Visibility(
+              visible: !isVisible,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: IconButton(
+                  icon: Icon(Icons.download),
+                  onPressed: onPressed
+                ),
               ),
             )
           ],

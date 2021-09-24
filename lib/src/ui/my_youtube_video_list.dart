@@ -7,7 +7,10 @@ import '../ui/custom_video_tile.dart';
 
 
 class MyYoutubeVideoList extends StatefulWidget {
-  const MyYoutubeVideoList({Key? key}) : super(key: key);
+
+  final String choiceValue;
+
+  const MyYoutubeVideoList({Key? key,required this.choiceValue}) : super(key: key);
 
   @override
   _MyYoutubeVideoListState createState() => _MyYoutubeVideoListState();
@@ -19,78 +22,54 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
     {
       'title' : 'ZERO BUDGET NATURAL FARMING (ZBNF) | Subhash Palekar',
       'url' :'https://www.youtube.com/watch?v=m3d7X6UluNk&t=224s',
+      'language':'English'
     },
     {
       'title' : 'ZBNF kannada videos (DAY 3 PART1 VIDEO 3)',
       'url' :'https://www.youtube.com/watch?v=b22Z_mbqrX8',
+      'language':'Telugu'
     },
     {
       'title' : 'Waste Decomposer नहीं है स्वदेशी | Subhash Palekar | Zero Budget Natural Farming in India',
       'url' :'https://www.youtube.com/watch?v=S5UQ_bs6JXE',
+      'language':'Hindi'
     },
     {
       'title' : 'ఎకరానికి రూ.10 లక్షల ఆదాయ పద్ధతి | Subhash Palekar Lessons #46 | hmtv Agri',
       'url' :'https://www.youtube.com/watch?v=R3Dy2ixBeBU',
+      'language':'English'
 
     },
     {
       'title' : 'जीवामृत का निर्माण सीखे सुभाष पालेकर द्वारा | Make Jivamrit at Home with Subhash Palekar SPNF,ZBNF',
       'url' :'https://www.youtube.com/watch?v=Jefa3i4ZpVg',
-      ////0Hello
-      ///fdbdfbfdb
-      ////jfgyjgyfjgfjf
-      //dcjsbcajscbcnkasckj
+      'language':'Hindi'
     }
 
   ];
 
-  late YoutubePlayerController _controller;
-  late TextEditingController _idController;
-  late TextEditingController _seekToController;
 
-  late PlayerState _playerState;
-  late YoutubeMetaData _videoMetaData;
-  double _volume = 100;
-  bool _muted = false;
-  bool _isPlayerReady = false;
+  List filterList =[];
 
 
   @override
   void initState() {
     super.initState();
-    _idController = TextEditingController();
-    _seekToController = TextEditingController();
-    _videoMetaData = const YoutubeMetaData();
-    _playerState = PlayerState.unknown;
-
   }
 
-  void listener() {
-    if (_isPlayerReady && mounted && !_controller.value.isFullScreen) {
-      setState(() {
-        _playerState = _controller.value.playerState;
-        _videoMetaData = _controller.metadata;
-      });
-    }
-  }
-
-  // @override
-  // void deactivate() {
-  //   // Pauses video while navigating to next page.
-  //   _controller.pause();
-  //   super.deactivate();
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   _controller.dispose();
-  //   _idController.dispose();
-  //   _seekToController.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      filterList.clear();
+      if(widget.choiceValue.isNotEmpty) {
+        filterList.addAll(
+            videoList.where((e) => e['language'] == widget.choiceValue)
+                .toList());
+      }else{
+        filterList.addAll(videoList);
+      }
+    });
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -99,40 +78,17 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
             Expanded(
               child: Container(
                 child: ListView.builder(
-                  itemCount: videoList.length,
+                  itemCount: filterList.length,
                     itemBuilder: (context,index) => customVideoTile(
                       onPressed: (){
                           Downloader().downloadVideo(
-                              videoList[index]['url'],
-                              videoList[index]['title']
+                              filterList[index]['url'],
+                              filterList[index]['title']
                           );
                       },
-                      url: videoList[index]['url'],
-                      title: videoList[index]['title'],
+                      title: filterList[index]['title'],
+                      url: filterList[index]['url'],
                     ),
-                    // itemBuilder: (context,index){
-                    //     return Padding(
-                    //       padding: const EdgeInsets.all(8.0),
-                    //       child: YoutubePlayer(
-                    //         controller: YoutubePlayerController(
-                    //           initialVideoId: YoutubePlayer
-                    //               .convertUrlToId(videoList[index]['url']) as String,
-                    //           flags: const YoutubePlayerFlags(
-                    //             mute: false,
-                    //             autoPlay: false,
-                    //             disableDragSeek: false,
-                    //             loop: false,
-                    //             isLive: false,
-                    //             forceHD: false,
-                    //             enableCaption: true,
-                    //
-                    //           ),
-                    //         ),
-                    //         liveUIColor: Colors.amber,
-                    //       ),
-                    //
-                    //     );
-                    // },
                 ),
               ),
             ),

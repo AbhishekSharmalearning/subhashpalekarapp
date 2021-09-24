@@ -1,18 +1,25 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:subhashpalekarapp/utils/Constants.dart';
-
 import 'my_audio_list.dart';
 import 'my_youtube_video_list.dart';
 
-class MultimediaList extends StatelessWidget {
+class MultimediaList extends StatefulWidget {
   const MultimediaList({Key? key}) : super(key: key);
 
+  @override
+  _MultimediaListState createState() => _MultimediaListState();
+}
 
+class _MultimediaListState extends State<MultimediaList> {
+
+  String choiceValue ="";
 
   @override
   Widget build(BuildContext context) {
     AudioPlayer audioPlayer = AudioPlayer();
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -54,15 +61,19 @@ class MultimediaList extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            Center(child: MyYoutubeVideoList()),
-            Center(child: MyAudioList()),
+            Center(child: MyYoutubeVideoList(choiceValue: choiceValue)),
+            Center(child: MyAudioList(choiceValue: choiceValue)),
           ],
         ),
       ),
     );
   }
 
+
   choiceAction(String choice) {
+    setState(() {
+      choiceValue = choice;
+    });
 
   }
 }
