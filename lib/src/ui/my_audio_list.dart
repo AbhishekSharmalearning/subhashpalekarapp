@@ -137,9 +137,6 @@ class _MyAudioListState extends State<MyAudioList> {
 
       final dirList = await _getExternalStoragePath();
       final path = dirList![0].path;
-
-      // prefs = await SharedPreferences.getInstance();
-     // addStringToSF(path);
       datacount.write(Constants.FILEPATH, path);
       file =  File('$path/$fileName');
       print('File is : $file');
@@ -179,11 +176,9 @@ class _MyAudioListState extends State<MyAudioList> {
 
   @override
   Widget build(BuildContext context) {
-
-
     setState(() {
       filterList.clear();
-      if(widget.choiceValue.isNotEmpty) {
+      if(widget.choiceValue.isNotEmpty && widget.choiceValue != 'All') {
         filterList.addAll(
             musicList.where((e) => e['language'] == widget.choiceValue)
                 .toList());
@@ -202,16 +197,12 @@ class _MyAudioListState extends State<MyAudioList> {
                       setState(() {
                         if(isExist(index)){
                           playMusic(datacount.read(Constants.FILEPATH) + "/" + filterList[index]['title'] + ".mp3");
-                          currentTitle = filterList[index]['title'];
-                          currentCover = filterList[index]['coverurl'];
-                          currentSinger = filterList[index]['Singer'];
                         }else{
                           playMusic(filterList[index]['url']);
-                          currentTitle = filterList[index]['title'];
-                          currentCover = filterList[index]['coverurl'];
-                          currentSinger = filterList[index]['Singer'];
                         }
-
+                        currentTitle = filterList[index]['title'];
+                        currentCover = filterList[index]['coverurl'];
+                        currentSinger = filterList[index]['Singer'];
                       });
                     },
                     onPressed: (){
@@ -252,8 +243,8 @@ class _MyAudioListState extends State<MyAudioList> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                       Container(
-                        height: 60.0,
-                        width: 60.0,
+                        height: 50.0,
+                        width: 50.0,
                         child: CircleAvatar(
                           backgroundImage: NetworkImage(currentCover),
                           radius: 40.0,
