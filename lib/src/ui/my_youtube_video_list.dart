@@ -1,5 +1,11 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_youtube_downloader/flutter_youtube_downloader.dart';
+import 'package:provider/provider.dart';
 import 'package:subhashpalekarapp/utils/Downloader.dart';
+import 'package:subhashpalekarapp/utils/connectionStatusSingleton.dart';
+import 'dart:async';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +15,6 @@ import '../ui/custom_video_tile.dart';
 class MyYoutubeVideoList extends StatefulWidget {
 
   final String choiceValue;
-
   const MyYoutubeVideoList({Key? key,required this.choiceValue}) : super(key: key);
 
   @override
@@ -17,6 +22,10 @@ class MyYoutubeVideoList extends StatefulWidget {
 }
 
 class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
+
+  var _connectionStatus = 'Unknown';
+  late Connectivity connectivity;
+  late StreamSubscription<ConnectivityResult> subscription;
 
   List videoList = [
     {
@@ -45,24 +54,29 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
       'url' :'https://www.youtube.com/watch?v=Jefa3i4ZpVg',
       'language':'Hindi'
     }
-
   ];
 
-
   List filterList =[];
-
 
   @override
   void initState() {
     super.initState();
+    connectivity = new Connectivity();
+    subscription = connectivity.onConnectivityChanged.listen((ConnectivityResult result){
+    });
   }
 
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     setState(() {
       filterList.clear();
-      if(widget.choiceValue.isNotEmpty) {
+      if(widget.choiceValue.isNotEmpty && widget.choiceValue != 'All') {
         filterList.addAll(
             videoList.where((e) => e['language'] == widget.choiceValue)
                 .toList());
@@ -81,10 +95,10 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
                   itemCount: filterList.length,
                     itemBuilder: (context,index) => customVideoTile(
                       onPressed: (){
-                          Downloader().downloadVideo(
-                              filterList[index]['url'],
-                              filterList[index]['title']
-                          );
+                        Downloader().downloadVideo(
+                            filterList[index]['url'],
+                            filterList[index]['title']
+                        );
                       },
                       title: filterList[index]['title'],
                       url: filterList[index]['url'],
@@ -95,7 +109,6 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
           ],
         ),
       ),
-
     );
   }
 }

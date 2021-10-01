@@ -1,7 +1,10 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:subhashpalekarapp/utils/Constants.dart';
+import 'package:subhashpalekarapp/utils/NoInternet.dart';
+import 'package:subhashpalekarapp/utils/connectionStatusSingleton.dart';
 import 'my_audio_list.dart';
 import 'my_youtube_video_list.dart';
 
@@ -15,55 +18,72 @@ class MultimediaList extends StatefulWidget {
 class _MultimediaListState extends State<MultimediaList> {
 
   String choiceValue ="";
+  int index =0;
+
+  Widget screens(int index) {
+    switch (index){
+      case 0:
+        return MyYoutubeVideoList(choiceValue: choiceValue);
+        break;
+      case 1:
+        return MyAudioList(choiceValue: choiceValue);
+        break;
+      default:
+        return MyYoutubeVideoList(choiceValue: choiceValue);
+        break;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<ConnectionStatusSingleton>(context,listen: false).startMonitoring();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
+    final item = <Widget>[
+      Icon(Icons.video_collection,size: 30),
+      Icon(Icons.audiotrack,size: 30)
+    ];
     AudioPlayer audioPlayer = AudioPlayer();
-
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.green[900],
-          title: Text('Subhash Palekar App'),
-          centerTitle: true,
+    return Scaffold(
+      extendBody: true,
+      appBar: AppBar(
+        backgroundColor: Colors.green[900],
+        title: Text('Subhash Palekar App'),
+        centerTitle: true,
           actions: [
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return Constants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice)
-                  );
-                }).toList();
-                },
-            )
-          ],
-          bottom: const TabBar(
-            indicatorColor: Colors.green,
-              indicatorWeight: 5.0,
-              tabs: [
-                Tab(
-                  icon: Icon(Icons.video_camera_front),
-                  text: ('Video'),
-                ),
-                Tab(
-                  icon: Icon(
-                      Icons.audiotrack
-                  ),
-                  text: (
-                      'Audio'
-                  ),
-                )
-              ],
-          ),
+        PopupMenuButton<String>(
+          onSelected: choiceAction,
+          itemBuilder: (BuildContext context) {
+            return Constants.choices.map((String choice) {
+              return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice)
+              );
+            }).toList();
+          },
         ),
-        body: TabBarView(
-          children: [
-            Center(child: MyYoutubeVideoList(choiceValue: choiceValue)),
-            Center(child: MyAudioList(choiceValue: choiceValue)),
-          ],
+      ],
+      ),
+      body: pageUI(),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          iconTheme: IconThemeData(color: Colors.white)
+        ),
+        child: CurvedNavigationBar(
+          color: Colors.green.shade900,
+          buttonBackgroundColor: Colors.purple,
+          backgroundColor: Colors.transparent,
+          animationCurve: Curves.easeInOut,
+          animationDuration: Duration(milliseconds: 500),
+          items: item,
+          height: 60,
+          index: index,
+          onTap: (index) => setState(() => this.index = index),
         ),
       ),
     );
@@ -74,6 +94,22 @@ class _MultimediaListState extends State<MultimediaList> {
     setState(() {
       choiceValue = choice;
     });
+  }
 
+  Widget pageUI(){
+    return Consumer<ConnectionStatusSingleton>(
+        builder: (context,model, child){
+          if(model.isOnline !=null){
+            return model.isOnline
+                ? SafeArea(child: screens(index)
+            ) : SafeArea(child: NoInternet());
+          }
+          return Container(
+            child: Center(
+              child:  CircularProgressIndicator(),
+            ),
+          );
+        },
+    );
   }
 }
