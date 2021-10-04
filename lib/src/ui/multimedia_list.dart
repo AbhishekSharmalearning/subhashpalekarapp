@@ -1,4 +1,4 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +7,8 @@ import 'package:subhashpalekarapp/utils/NoInternet.dart';
 import 'package:subhashpalekarapp/utils/connectionStatusSingleton.dart';
 import 'my_audio_list.dart';
 import 'my_youtube_video_list.dart';
+
+final languageRef = FirebaseFirestore.instance.collection('data');
 
 class MultimediaList extends StatefulWidget {
   const MultimediaList({Key? key}) : super(key: key);
@@ -19,6 +21,7 @@ class _MultimediaListState extends State<MultimediaList> {
 
   String choiceValue ="";
   int index =0;
+  List languages_List = [];
 
   Widget screens(int index) {
     switch (index){
@@ -36,8 +39,10 @@ class _MultimediaListState extends State<MultimediaList> {
 
   @override
   void initState() {
+    getLanguage();
     super.initState();
     Provider.of<ConnectionStatusSingleton>(context,listen: false).startMonitoring();
+
   }
 
 
@@ -48,7 +53,7 @@ class _MultimediaListState extends State<MultimediaList> {
       Icon(Icons.video_collection,size: 30),
       Icon(Icons.audiotrack,size: 30)
     ];
-    AudioPlayer audioPlayer = AudioPlayer();
+
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
@@ -59,12 +64,12 @@ class _MultimediaListState extends State<MultimediaList> {
         PopupMenuButton<String>(
           onSelected: choiceAction,
           itemBuilder: (BuildContext context) {
-            return Constants.choices.map((String choice) {
-              return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice)
-              );
-            }).toList();
+            return languages_List.map((item) => (
+               PopupMenuItem<String>(
+                 value: item['id'],
+                 child: Text(item['name']),
+               )),
+            ).toList();
           },
         ),
       ],
@@ -99,17 +104,17 @@ class _MultimediaListState extends State<MultimediaList> {
   Widget pageUI(){
     return Consumer<ConnectionStatusSingleton>(
         builder: (context,model, child){
-          if(model.isOnline !=null){
-            return model.isOnline
-                ? SafeArea(child: screens(index)
-            ) : SafeArea(child: NoInternet());
-          }
-          return Container(
-            child: Center(
-              child:  CircularProgressIndicator(),
-            ),
-          );
+          return model.isOnline
+              ? SafeArea(child: screens(index)
+          ) : SafeArea(child: NoInternet());
         },
     );
+  }
+
+  void getLanguage() async {
+    final messages= await FirebaseFirestore.instance.collection('languages').get();
+    for(var message in messages.docs){
+      languages_List.add(message.data());
+    }
   }
 }

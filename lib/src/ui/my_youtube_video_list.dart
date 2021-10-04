@@ -1,12 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_youtube_downloader/flutter_youtube_downloader.dart';
-import 'package:provider/provider.dart';
 import 'package:subhashpalekarapp/utils/Downloader.dart';
-import 'package:subhashpalekarapp/utils/connectionStatusSingleton.dart';
 import 'dart:async';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/cupertino.dart';
 import '../ui/custom_video_tile.dart';
@@ -23,10 +19,10 @@ class MyYoutubeVideoList extends StatefulWidget {
 
 class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
 
-  var _connectionStatus = 'Unknown';
   late Connectivity connectivity;
   late StreamSubscription<ConnectivityResult> subscription;
 
+  List youtubeVideoList =[];
   List videoList = [
     {
       'title' : 'ZERO BUDGET NATURAL FARMING (ZBNF) | Subhash Palekar',
@@ -60,17 +56,15 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
 
   @override
   void initState() {
-    super.initState();
-    connectivity = new Connectivity();
-    subscription = connectivity.onConnectivityChanged.listen((ConnectivityResult result){
+    getVideoList().then((List list) {
+      setState(() {
+        youtubeVideoList = list;
+      });
     });
+    super.initState();
+
   }
 
-  @override
-  void dispose() {
-    subscription.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,10 +72,10 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
       filterList.clear();
       if(widget.choiceValue.isNotEmpty && widget.choiceValue != 'All') {
         filterList.addAll(
-            videoList.where((e) => e['language'] == widget.choiceValue)
+            youtubeVideoList.where((e) => e['language_code'] == widget.choiceValue)
                 .toList());
       }else{
-        filterList.addAll(videoList);
+        filterList.addAll(youtubeVideoList);
       }
     });
     return Scaffold(
@@ -96,12 +90,12 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
                     itemBuilder: (context,index) => customVideoTile(
                       onPressed: (){
                         Downloader().downloadVideo(
-                            filterList[index]['url'],
+                            filterList[index]['youtubevid'],
                             filterList[index]['title']
                         );
                       },
                       title: filterList[index]['title'],
-                      url: filterList[index]['url'],
+                      url: filterList[index]['youtubevid'],
                     ),
                 ),
               ),
@@ -110,5 +104,17 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
         ),
       ),
     );
+  }
+
+  Future<List> getVideoList() async{
+    List videoListTemp = [];
+    final videos= await FirebaseFirestore.instance.collection('data').get();
+    for(var video in videos.docs){
+      if(video.data()['media_type'] == 'V'){
+        videoListTemp.add(video.data());
+      }
+    }
+    return videoListTemp;
+
   }
 }

@@ -22,13 +22,6 @@ class MyApp extends StatelessWidget {
           ),
         ),
     );
-
-     MaterialApp(
-      theme: ThemeData.dark(),
-      home: Scaffold(
-        body: MultimediaList(),
-      ),
-    );
   }
 }
 

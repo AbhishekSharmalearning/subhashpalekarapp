@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:path_provider/path_provider.dart' as p;
 import 'package:subhashpalekarapp/src/ui/custom_list_tile.dart';
 import 'package:subhashpalekarapp/utils/Constants.dart';
-import 'dart:io' as io;
 
 class MyAudioList extends StatefulWidget {
 
@@ -20,6 +20,7 @@ class MyAudioList extends StatefulWidget {
 
 class _MyAudioListState extends State<MyAudioList> {
 
+  List audioList =[];
   List musicList = [
     {
       'title' : 'Tech House vibes',
@@ -119,6 +120,11 @@ class _MyAudioListState extends State<MyAudioList> {
   @override
   void initState() {
     // TODO: implement initState
+    getMusicList().then((List list) {
+      setState(() {
+        audioList = list;
+      });
+    });
     super.initState();
     dio = Dio();
   }
@@ -176,16 +182,16 @@ class _MyAudioListState extends State<MyAudioList> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
+     setState(() {
       filterList.clear();
       if(widget.choiceValue.isNotEmpty && widget.choiceValue != 'All') {
         filterList.addAll(
-            musicList.where((e) => e['language'] == widget.choiceValue)
+            audioList.where((e) => e['language_code'] == widget.choiceValue)
                 .toList());
       }else{
-        filterList.addAll(musicList);
+        filterList.addAll(audioList);
       }
-    });
+     });
     return Scaffold(
       body: Column(
         children: [
@@ -198,19 +204,19 @@ class _MyAudioListState extends State<MyAudioList> {
                         if(isExist(index)){
                           playMusic(datacount.read(Constants.FILEPATH) + "/" + filterList[index]['title'] + ".mp3");
                         }else{
-                          playMusic(filterList[index]['url']);
+                          playMusic(filterList[index]['audio_url']);
                         }
                         currentTitle = filterList[index]['title'];
-                        currentCover = filterList[index]['coverurl'];
-                        currentSinger = filterList[index]['Singer'];
+                        currentCover = Constants.THUMBNAIL_URL;
+                        currentSinger = "Subhash Palekar";
                       });
                     },
                     onPressed: (){
-                      _downloadAndSaveFileToStorage(filterList[index]['url'], filterList[index]['title']+'.mp3');
+                      _downloadAndSaveFileToStorage(filterList[index]['audio_url'], filterList[index]['title']+'.mp3');
                     },
                       title:  filterList[index]['title'],
-                      singer: filterList[index]['Singer'],
-                      cover: filterList[index]['coverurl'],
+                      singer: "Subhash Palekar",
+                      cover: Constants.THUMBNAIL_URL,
                       filePath : isExist(index) ,
                   ),
               ),
@@ -308,7 +314,20 @@ class _MyAudioListState extends State<MyAudioList> {
     );
   }
 
+  Future<List> getMusicList() async{
+    List musicListTemp = [];
+    final audios= await FirebaseFirestore.instance.collection('data').get();
+    for(var audio in audios.docs){
+      if(audio.data()['media_type'] == 'A'){
+        musicListTemp.add(audio.data());
+      }
+    }
+    return musicListTemp;
+  }
+
 
 
 
 }
+
+
