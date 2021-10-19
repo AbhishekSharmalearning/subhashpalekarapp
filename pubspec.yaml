@@ -1,4 +1,4 @@
-name: subhashpalekarapp
+name: SPNF
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -40,13 +40,31 @@ dependencies:
   get_storage: ^2.0.3
   youtube_explode_dart: ^1.9.10
   curved_navigation_bar: ^1.0.1
-
-
-
+  cloud_firestore: ^2.5.3
+  firebase_auth: ^3.1.2
+  firebase_core: ^1.7.0
+  percent_indicator: ^3.4.0
+  permission_handler: ^8.1.6
+  downloads_path_provider_28: ^0.1.2
+  open_file: ^3.2.1
+  flutter_local_notifications: ^9.0.0
+  auto_route:
+    git:
+      url: https://github.com/madtocc/auto_route_library.git
+      ref: hotfix/flutter_2.2.3
+      path: auto_route/
 
 
 
 dev_dependencies:
+
+  flutter_lints: ^1.0.4
+  auto_route_generator:
+    git:
+      url: https://github.com/madtocc/auto_route_library.git
+      ref: hotfix/flutter_2.2.3
+      path: auto_route_generator/
+  build_runner: ^2.1.2
   flutter_test:
     sdk: flutter
 

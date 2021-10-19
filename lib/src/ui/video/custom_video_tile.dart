@@ -13,8 +13,7 @@ Widget customVideoTile({required String url,required String title,onPressed}
           padding: EdgeInsets.all(8.0),
           child: YoutubePlayer(
             controller: YoutubePlayerController(
-                initialVideoId: YoutubePlayer
-                        .convertUrlToId(url) as String,
+                initialVideoId: url,
                         flags: const YoutubePlayerFlags(
                           mute: false,
                           autoPlay: false,

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "145516006188",
+    "project_id": "farmingguide-7b246",
+    "storage_bucket": "farmingguide-7b246.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145516006188:android:10eca19555ef6361583a89",
+        "android_client_info": {
+          "package_name": "com.example.subhashpalekarapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145516006188-sj5606n793boh2g5srskd98kc07888sh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0z7cSoLZYEbErT8zSXAC7zMq-IRuih10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145516006188-sj5606n793boh2g5srskd98kc07888sh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
