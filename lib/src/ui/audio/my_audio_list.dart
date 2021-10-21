@@ -20,7 +20,7 @@ class MyAudioList extends StatefulWidget {
 
   final String choiceValue;
 
-  const MyAudioList({Key? key, required this.choiceValue}) : super(key: key);
+  MyAudioList({Key? key, required this.choiceValue}) : super(key: key);
 
   @override
   _MyAudioListState createState() => _MyAudioListState();

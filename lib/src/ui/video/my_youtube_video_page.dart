@@ -1,3 +1,6 @@
+import 'package:SPNF/router/router.gr.dart';
+import 'package:SPNF/utils/widgets.dart';
+import 'package:auto_route/src/router/auto_router_x.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -8,16 +11,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:SPNF/utils/PreferenceUtils.dart';
 import 'package:SPNF/utils/FireStoreQuery.dart';
 
-class MyYoutubeVideoList extends StatefulWidget {
+class MyYoutubeVideoPage extends StatefulWidget {
 
   final String choiceValue;
-  const MyYoutubeVideoList({Key? key,required this.choiceValue}) : super(key: key);
+  const MyYoutubeVideoPage({
+    Key? key,
+    required this.choiceValue}
+    ) : super(key: key);
 
   @override
-  _MyYoutubeVideoListState createState() => _MyYoutubeVideoListState();
+  _MyYoutubeVideoPageState createState() => _MyYoutubeVideoPageState();
 }
 
-class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
+class _MyYoutubeVideoPageState extends State<MyYoutubeVideoPage> {
 
   late Connectivity connectivity;
   late StreamSubscription<ConnectivityResult> subscription;
@@ -65,30 +71,15 @@ class _MyYoutubeVideoListState extends State<MyYoutubeVideoList> {
         padding: const EdgeInsets.all(4.0),
         child: Column(
           children: [
-            Expanded(
-              child: Container(
-                child: ListView.builder(
-                  itemCount: filterList.length,
-                  itemBuilder: (context,index){
-                    return GestureDetector(
-                      child: Container(
-                        height: 70,
-                        child: Card(
-                          elevation: 10,
-                          child: Chip(
-                            label: Text(filterList[index]['heading']),
-                            shadowColor: Colors.blue,
-                            backgroundColor: Colors.green,
-                            elevation: 5,
-                            autofocus: true,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+            for (int i = 0; i < filterList.length; i++)
+              VideoTitleTile(
+                  videoTitle : filterList[i]['heading'],
+                  onTileTap : () => context.router.push(
+                    ListDetailRoute(
+                        listHeading: filterList[i]['list']
+                    ),
+                  ),
               ),
-            ),
           ],
         ),
       ),

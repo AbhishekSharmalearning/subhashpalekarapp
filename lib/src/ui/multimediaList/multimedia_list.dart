@@ -1,3 +1,5 @@
+import 'package:SPNF/router/router.gr.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -9,8 +11,7 @@ import 'package:SPNF/utils/Constants.dart';
 import 'package:SPNF/utils/FireStoreQuery.dart';
 import 'package:SPNF/utils/PreferenceUtils.dart';
 import 'package:SPNF/utils/connectionStatusSingleton.dart';
-import '../audio/my_audio_list.dart';
-import '../video/my_youtube_video_list.dart';
+
 
 final languageRef = FirebaseFirestore.instance.collection('data');
 
@@ -32,7 +33,7 @@ class _MultimediaListState extends State<MultimediaList> {
   List contacts =[];
   final datacount = GetStorage();
 
-  Widget screens(int index) {
+  /*Widget screens(int index) {
     var selectedLang = choiceValue.isNotEmpty ? choiceValue : Constants.DEFAULTLANGUAGE;
     switch (index){
       case 0:
@@ -45,7 +46,8 @@ class _MultimediaListState extends State<MultimediaList> {
         return MyYoutubeVideoList(choiceValue: selectedLang);
         break;
     }
-  }
+  }*/
+
 
   @override
   void initState() {
@@ -84,8 +86,48 @@ class _MultimediaListState extends State<MultimediaList> {
       Icon(Icons.video_collection,size: 30),
       Icon(Icons.audiotrack,size: 30)
     ];
+    var selectedLang = choiceValue.isNotEmpty ? choiceValue : Constants.DEFAULTLANGUAGE;
 
-    return Scaffold(
+    return AutoTabsScaffold(
+        appBarBuilder: (_, tabsRouter) => AppBar(
+          backgroundColor: Colors.green[900],
+          title: Text('SPNF'),
+          centerTitle: true,
+          leading: const AutoBackButton(),
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return languages_List.map((item) => (
+                    PopupMenuItem<String>(
+                      value: item['id'],
+                      child: Text(item['name']),
+                    )),
+                ).toList();
+              },
+            ),
+          ],
+        ),
+        routes: [
+          VideosRouter(choiceValue: selectedLang),
+          AudiosRouter(choiceValue: selectedLang),
+        ],
+        bottomNavigationBuilder: (_,tabsRouter) {
+          return CurvedNavigationBar(
+             color: Colors.green.shade900,
+             buttonBackgroundColor: Colors.purple,
+             backgroundColor: Colors.transparent,
+             animationCurve: Curves.easeInOut,
+             animationDuration: Duration(milliseconds: 500),
+             items: item,
+             height: 60,
+             index: tabsRouter.activeIndex,
+             onTap: tabsRouter.setActiveIndex,
+           );
+        },
+    );
+
+    /*return Scaffold(
       extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.green[900],
@@ -122,7 +164,7 @@ class _MultimediaListState extends State<MultimediaList> {
           onTap: (index) => setState(() => this.index = index),
         ),
       ),
-    );
+    );*/
   }
 
 
@@ -132,7 +174,7 @@ class _MultimediaListState extends State<MultimediaList> {
     });
   }
 
-  Widget pageUI(){
+ /* Widget pageUI(){
     return Consumer<ConnectionStatusSingleton>(
         builder: (context,model, child){
           return SafeArea(
@@ -140,7 +182,7 @@ class _MultimediaListState extends State<MultimediaList> {
           );
         },
     );
-  }
+  }*/
 
 
   Future<List> getLanguageFinal() async{
