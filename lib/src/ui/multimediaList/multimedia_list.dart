@@ -1,4 +1,5 @@
-import 'package:SPNF/router/router.gr.dart';
+import 'package:SPNF/src/ui/audio/my_audio_list.dart';
+import 'package:SPNF/src/ui/video/my_youtube_video_page.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ import 'package:SPNF/utils/connectionStatusSingleton.dart';
 final languageRef = FirebaseFirestore.instance.collection('data');
 
 class MultimediaList extends StatefulWidget {
-  const MultimediaList({Key? key}) : super(key: key);
+
 
   @override
   _MultimediaListState createState() => _MultimediaListState();
@@ -32,21 +33,12 @@ class _MultimediaListState extends State<MultimediaList> {
   bool isGetDataFromServer = true;
   List contacts =[];
   final datacount = GetStorage();
+  int _selectedIndex = 0;
 
-  /*Widget screens(int index) {
-    var selectedLang = choiceValue.isNotEmpty ? choiceValue : Constants.DEFAULTLANGUAGE;
-    switch (index){
-      case 0:
-        return MyYoutubeVideoList(choiceValue: selectedLang);
-        break;
-      case 1:
-        return MyAudioList(choiceValue: selectedLang);
-        break;
-      default:
-        return MyYoutubeVideoList(choiceValue: selectedLang);
-        break;
-    }
-  }*/
+  List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>()
+  ];
 
 
   @override
@@ -74,7 +66,12 @@ class _MultimediaListState extends State<MultimediaList> {
       print('Take the user to the settings page.');
       await openAppSettings();
     }
-    datacount.write(Constants.PERMISSION, PermissionStatus.granted);
+    if(status == PermissionStatus.granted){
+      datacount.write(Constants.PERMISSION, true);
+    }else{
+      datacount.write(Constants.PERMISSION, false);
+    }
+
     return status == PermissionStatus.granted;
   }
 
@@ -82,18 +79,23 @@ class _MultimediaListState extends State<MultimediaList> {
 
   @override
   Widget build(BuildContext context) {
-    final item = <Widget>[
-      Icon(Icons.video_collection,size: 30),
-      Icon(Icons.audiotrack,size: 30)
-    ];
-    var selectedLang = choiceValue.isNotEmpty ? choiceValue : Constants.DEFAULTLANGUAGE;
+    return WillPopScope(
+      onWillPop: () async {
+        final isFirstRouteInCurrentTab =
+        !await _navigatorKeys[_selectedIndex].currentState!.maybePop();
 
-    return AutoTabsScaffold(
-        appBarBuilder: (_, tabsRouter) => AppBar(
+        print(
+            'isFirstRouteInCurrentTab: ' + isFirstRouteInCurrentTab.toString());
+
+        // let system handle back button if we're on the first route
+        return isFirstRouteInCurrentTab;
+      },
+      child: Scaffold(
+        extendBody: true,
+        appBar: AppBar(
           backgroundColor: Colors.green[900],
           title: Text('SPNF'),
           centerTitle: true,
-          leading: const AutoBackButton(),
           actions: [
             PopupMenuButton<String>(
               onSelected: choiceAction,
@@ -108,81 +110,94 @@ class _MultimediaListState extends State<MultimediaList> {
             ),
           ],
         ),
-        routes: [
-          VideosRouter(choiceValue: selectedLang),
-          AudiosRouter(choiceValue: selectedLang),
-        ],
-        bottomNavigationBuilder: (_,tabsRouter) {
-          return CurvedNavigationBar(
-             color: Colors.green.shade900,
-             buttonBackgroundColor: Colors.purple,
-             backgroundColor: Colors.transparent,
-             animationCurve: Curves.easeInOut,
-             animationDuration: Duration(milliseconds: 500),
-             items: item,
-             height: 60,
-             index: tabsRouter.activeIndex,
-             onTap: tabsRouter.setActiveIndex,
-           );
-        },
-    );
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          showSelectedLabels: true,
+          showUnselectedLabels: false,
 
-    /*return Scaffold(
-      extendBody: true,
-      appBar: AppBar(
-        backgroundColor: Colors.green[900],
-        title: Text('SPNF'),
-        centerTitle: true,
-          actions: [
-        PopupMenuButton<String>(
-          onSelected: choiceAction,
-          itemBuilder: (BuildContext context) {
-            return languages_List.map((item) => (
-               PopupMenuItem<String>(
-                 value: item['id'],
-                 child: Text(item['name']),
-               )),
-            ).toList();
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.video_collection,
+                color: Colors.white,
+              ),
+              label: 'Video',
+              activeIcon: Icon(
+                Icons.video_collection,
+                color: Colors.green,
+              ),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.audiotrack,
+                color: Colors.white,
+              ),
+              label: 'Audio',
+              activeIcon: Icon(
+                Icons.audiotrack,
+                color: Colors.green,
+              ),
+            ),
+          ],
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
           },
+
         ),
-      ],
-      ),
-      body: pageUI(),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          iconTheme: IconThemeData(color: Colors.white)
-        ),
-        child: CurvedNavigationBar(
-          color: Colors.green.shade900,
-          buttonBackgroundColor: Colors.purple,
-          backgroundColor: Colors.transparent,
-          animationCurve: Curves.easeInOut,
-          animationDuration: Duration(milliseconds: 500),
-          items: item,
-          height: 60,
-          index: index,
-          onTap: (index) => setState(() => this.index = index),
+        body: Stack(
+          children: [
+            _buildOffstageNavigator(0),
+            _buildOffstageNavigator(1),
+          ],
         ),
       ),
-    );*/
+    );
+  }
+
+  Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
+    if(choiceValue.isEmpty){
+      choiceValue = Constants.DEFAULTLANGUAGE;
+    }else{
+      choiceValue = choiceValue;
+    }
+    return {
+      '/': (context) {
+        return [
+          MyYoutubeVideoPage(choiceValue: choiceValue),
+          MyAudioList(choiceValue: choiceValue),
+        ].elementAt(index);
+      },
+    };
+  }
+
+  Widget _buildOffstageNavigator(int index) {
+    var routeBuilders = _routeBuilders(context, index);
+    var route_builder_temp;
+    return Offstage(
+      offstage: _selectedIndex != index,
+      child: Navigator(
+        key: _navigatorKeys[index],
+        onGenerateRoute: (routeSettings) {
+          route_builder_temp = routeBuilders[routeSettings.name];
+          if(route_builder_temp!=null){
+            return MaterialPageRoute(
+              builder: (context) => route_builder_temp(context),
+            );
+          }
+        },
+      ),
+    );
   }
 
 
   choiceAction(String choice) {
     setState(() {
-      choiceValue = choice;
+      choiceValue = choiceValue.isNotEmpty ? choice : Constants.DEFAULTLANGUAGE;;
     });
   }
 
- /* Widget pageUI(){
-    return Consumer<ConnectionStatusSingleton>(
-        builder: (context,model, child){
-          return SafeArea(
-              child: screens(index)
-          );
-        },
-    );
-  }*/
 
 
   Future<List> getLanguageFinal() async{

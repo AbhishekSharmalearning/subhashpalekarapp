@@ -16,11 +16,12 @@ class VideoTitleTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTileTap,
       child: Card(
-        margin: const EdgeInsets.only(bottom: 20),
+        color: Colors.white,
+        margin: const EdgeInsets.all(10),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 100,
-            vertical: 40,
+            vertical: 20,
           ),
           child: Column(
             children: [
@@ -28,6 +29,7 @@ class VideoTitleTile extends StatelessWidget {
                 videoTitle,
                 style: const TextStyle(
                   fontSize: 20,
+                  color: Colors.blueGrey,
                   fontWeight: FontWeight.bold,
                 ),
               ),

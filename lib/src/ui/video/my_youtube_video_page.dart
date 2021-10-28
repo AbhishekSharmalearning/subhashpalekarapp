@@ -1,4 +1,4 @@
-import 'package:SPNF/router/router.gr.dart';
+import 'package:SPNF/src/ui/video/list_detail_page.dart';
 import 'package:SPNF/utils/widgets.dart';
 import 'package:auto_route/src/router/auto_router_x.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -74,10 +74,13 @@ class _MyYoutubeVideoPageState extends State<MyYoutubeVideoPage> {
             for (int i = 0; i < filterList.length; i++)
               VideoTitleTile(
                   videoTitle : filterList[i]['heading'],
-                  onTileTap : () => context.router.push(
-                    ListDetailRoute(
-                        listHeading: filterList[i]['list']
-                    ),
+                  onTileTap : () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ListDetailPage(
+                              listHeading: filterList[i]['list']
+                          ),
+                      ),
                   ),
               ),
           ],

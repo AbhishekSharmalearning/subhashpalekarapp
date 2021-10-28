@@ -1,5 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class VideoStreamingPage extends StatelessWidget {
   final String youtubeId;
@@ -10,9 +11,19 @@ class VideoStreamingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text(
-        'HELLO AB HO JAAA BHAI',
+    return SafeArea(
+      child: YoutubePlayer(
+        controller: YoutubePlayerController(
+          initialVideoId: youtubeId, //Add videoID.
+          flags: YoutubePlayerFlags(
+            hideControls: false,
+            controlsVisibleAtStart: true,
+            autoPlay: false,
+            mute: false,
+          ),
+        ),
+        showVideoProgressIndicator: true,
+        progressIndicatorColor: Colors.blue,
       ),
     );
   }
