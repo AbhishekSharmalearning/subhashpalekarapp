@@ -495,7 +495,7 @@ class _MyAudioListState extends State<MyAudioList> {
       String basename =files[i].path;
       stringFiles.add(basename);
     }
-    print('file is $stringFiles');
+
   }
 
 }
