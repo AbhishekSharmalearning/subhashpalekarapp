@@ -5,17 +5,10 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 
 
-Widget customListTile({required String title, required String  singer, onTap,onPressed,required bool filePath,required int progress }
+Widget customListTile({required String title, required String  singer,
+  onTap,onPressed,required List fileList,
+  required int progress,required int selectedIndex, required int index }
 ){
-  bool isDownloaded = false;
-  bool isVisible = false;
-
-  if(progress > 0 && progress < 100){
-    isVisible = filePath;
-  }else if(progress == 100){
-    isDownloaded = true;
-  }
-
 
   return InkWell(
     onTap: onTap,
@@ -56,52 +49,89 @@ Widget customListTile({required String title, required String  singer, onTap,onP
                 ],
               ),
             ),
-            getMyWidget(isVisible, isDownloaded,progress,onPressed),
+            getMyWidget(progress,onPressed,fileList,selectedIndex,index,title),
           ],
       ),
     ),
   );
 }
 
-Widget getMyWidget(bool isVisible,bool isDownloaded,int progress, onPressed){
-  if(isVisible && !isDownloaded){
-    return Visibility(
-      visible: isVisible,
-        child: circularPercentageBar(progress)
-    );
+Widget getMyWidget(int progress, onPressed, List fileList, int selectedIndex, int index, String title){
+  if(selectedIndex == -1){
+    if(fileList.length > 0){
+      if(fileList.contains("/storage/emulated/0/Download/" + title +".mp3")){
+        return Container(
+          child: ShowEmptyIcon(),
+        );
+      }else{
+        return Container(
+          child: ShowDefaultIcon(onPressed),
+        );
+      }
+    }else{
+      return Container(
+        child: ShowDefaultIcon(onPressed),
+      );
+    }
   }else{
-    return Visibility(
-      visible: !isDownloaded,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 10.0),
-        child: IconButton(
-            icon: Icon(Icons.download),
-            onPressed: onPressed
-        ),
-      ),
-    );
+    if(selectedIndex!=index){
+      if(fileList.contains("/storage/emulated/0/Download/" + title +".mp3")){
+        return Container(
+          child: ShowEmptyIcon(),
+        );
+      }else{
+        return Container(
+          child: ShowDefaultIcon(onPressed),
+        );
+      }
+    }else{
+      if(progress==100){
+        return Container(
+          child: ShowEmptyIcon(),
+        );
+      }else{
+        return Container(
+          child: circularPercentageBar(progress),
+        );
+      }
+    }
   }
 }
 
+Widget ShowEmptyIcon() {
+  return Container();
+}
 
+Widget ShowDefaultIcon(onPressed){
+  return Padding(
+      padding:  const EdgeInsets.only(right: 10.0),
+    child: IconButton(
+        icon: Icon(Icons.download),
+        onPressed: onPressed
+    ),
+  );
+}
 
 
 Widget circularPercentageBar(int progress){
-  return new CircularPercentIndicator(
-    radius: 40.0,
-    lineWidth: 3.0,
-    animation: true,
-    percent: progress/100,
-    center: Text(
-      progress.toString() + "%",
-      style: TextStyle(
-          fontSize: 10.0,
-          fontWeight: FontWeight.w600,
-          color: Colors.white),
+  return Padding(
+    padding: const EdgeInsets.all(10.0),
+    child: new CircularPercentIndicator(
+      radius: 40.0,
+      lineWidth: 3.0,
+      animation: true,
+      percent: progress/100,
+      center: Text(
+        progress.toString() + "%",
+        style: TextStyle(
+            fontSize: 10.0,
+            fontWeight: FontWeight.w600,
+            color: Colors.white),
+      ),
+      backgroundColor: Colors.grey,
+      circularStrokeCap: CircularStrokeCap.round,
+      progressColor: Colors.redAccent,
     ),
-    backgroundColor: Colors.grey,
-    circularStrokeCap: CircularStrokeCap.round,
-    progressColor: Colors.redAccent,
   );
 }
 

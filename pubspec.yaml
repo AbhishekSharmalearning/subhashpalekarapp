@@ -54,6 +54,11 @@ dependencies:
       ref: hotfix/flutter_2.2.3
       path: auto_route/
 
+  flutter_file_manager: ^0.2.0
+  path_provider_ex: ^1.0.1
+  path: ^1.6.4
+
+
 
 
 dev_dependencies:
