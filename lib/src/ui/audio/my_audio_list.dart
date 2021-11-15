@@ -91,11 +91,8 @@ class _MyAudioListState extends State<MyAudioList> {
       } else {
         value = dir!.path;
       }
-
       final savePath = path.join(value, fileName);
-
       await _startDownload(savePath,urlPath,value);
-      // handle the scenario when user declines the permissions
     } else {
 
 
@@ -117,11 +114,14 @@ class _MyAudioListState extends State<MyAudioList> {
       );
       result['isSuccess'] = response.statusCode == 200;
       result['filePath'] = savePath;
+
     } catch (ex) {
       result['error'] = ex.toString();
     } finally {
       await _showNotification(result,savePath);
+      progressInt = 0;
     }
+
   }
 
   void _onReceiveProgress(int received, int total) {
@@ -144,10 +144,7 @@ class _MyAudioListState extends State<MyAudioList> {
 
 
   bool isExist(int index){
-
-   // return File(datacount.read(Constants.FILEPATH) !=null ?  datacount.read(Constants.FILEPATH) + "/" + filterList[index]['title'] + ".mp3" : "").existsSync();
     return File(datacount.read(Constants.FILEPATH) !=null ?  datacount.read(Constants.FILEPATH) : "").existsSync();
-
   }
 
   @override
@@ -167,50 +164,57 @@ class _MyAudioListState extends State<MyAudioList> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: filterList.length,
-                  itemBuilder: (context, index) => customListTile(
-                    onTap: () {
-                      setState(() {
-                        if(isExist(index)){
-                          playMusic(datacount.read(Constants.FILEPATH) + "/" + filterList[index]['title'] + ".mp3");
-                        }else{
-                          playMusic(filterList[index]['audio_url']);
-                        }
-                        currentTitle = filterList[index]['title'];
-                        currentSinger = filterList[index]['audio_by'];
-                      });
-                    },
-                    onPressed: (){
-                      setState(() {
-                        _selectedIndex = index;
-                      });
+            child: Container(
+              child: ListView.builder(
+                itemCount: filterList.length,
+                    itemBuilder: (context, index) => customListTile(
+                      onTap: () {
+                        setState(() {
+                          if(isExist(index)){
+                            playMusic(datacount.read(Constants.FILEPATH) + "/" + filterList[index]['title'] + ".mp3");
+                          }else{
+                            playMusic(filterList[index]['audio_url']);
+                          }
+                          currentTitle = filterList[index]['title'];
+                          currentSinger = filterList[index]['audio_by'];
+                        });
+                      },
+                      onPressed: (){
+                        getListFiles();
+                        setState(() {
+                          _selectedIndex = index;
+                        });
 
-                      _download(filterList[index]['audio_url'], filterList[index]['title']+'.mp3',filterList[index]);
-                    },
-                      title:  filterList[index]['title'],
-                      singer: filterList[index]['audio_by'],
-                      progress :  progressInt,
-                      selectedIndex :  _selectedIndex,
-                      index : index,
-                      fileList: stringFiles,
-                  ),
+                        _download(filterList[index]['audio_url'], filterList[index]['title']+'.mp3',filterList[index]);
+                      },
+                        title:  filterList[index]['title'],
+                        singer: filterList[index]['audio_by'],
+                        progress :  progressInt,
+                        selectedIndex :  _selectedIndex,
+                        index : index,
+                        fileList: stringFiles,
+                    ),
+                ), decoration: BoxDecoration(
+                    color: const Color(0xff7c94b6),
+                    image: new DecorationImage(
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.dstATop),
+                    image: new NetworkImage('https://images.unsplash.com/photo-1622310505762-a813a1c2e0bf?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Z3JlZW4lMjBjb2xvdXJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80',),
+                ),
               ),
-
+            ),
           ),
           Visibility(
             visible: isVisible,
             child: SafeArea(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[950],
-                  boxShadow: [
-                     BoxShadow(
-                        color: Color(0x55212121),
-                       blurRadius: 8.0,
-
-                     ),
-                  ],
+                  color: const Color(0xff7c94b6),
+                  image: new DecorationImage(
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.dstATop),
+                    image: new NetworkImage('https://images.unsplash.com/photo-1622310505762-a813a1c2e0bf?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Z3JlZW4lMjBjb2xvdXJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80',),
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -235,11 +239,17 @@ class _MyAudioListState extends State<MyAudioList> {
                         children: [
                           Text(
                             position.toString().split(".")[0],
-                            style: TextStyle(fontSize: 12),
+                            style: TextStyle(
+                                fontSize: 12,
+                              color: Colors.white70,
+                            ),
                           ),
                           Text(
                             duration.toString().split(".")[0],
-                            style: TextStyle(fontSize: 12),
+                            style: TextStyle(
+                                fontSize: 12,
+                              color: Colors.white70,
+                            ),
                           )
                         ],
                       ),
@@ -266,7 +276,7 @@ class _MyAudioListState extends State<MyAudioList> {
                                 currentTitle,
                                 style: TextStyle(
                                   fontSize: 16.0,
-                                  color: Colors.grey,
+                                  color: Colors.purple[700],
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -275,7 +285,7 @@ class _MyAudioListState extends State<MyAudioList> {
                                 currentSinger,
                                 style: TextStyle(
                                   fontSize: 14.0,
-                                  color: Colors.grey,
+                                  color: Colors.red[700],
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -483,14 +493,12 @@ class _MyAudioListState extends State<MyAudioList> {
         //
       });
     });
-
     return completer.future;
   }
 
   void getListFiles() async{
     Directory dir = Directory('/storage/emulated/0/Download');
     files = await dirContents(dir);
-
     for(int i=0; i<files.length;i++){
       String basename =files[i].path;
       stringFiles.add(basename);

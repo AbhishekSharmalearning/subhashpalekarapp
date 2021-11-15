@@ -12,45 +12,62 @@ Widget customListTile({required String title, required String  singer,
 
   return InkWell(
     onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.only(bottom: 8.0,left: 12.0,right: 12.0),
-      child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              height: 70.0,
-              width: 70.0,
-              child: CircleAvatar(
-                backgroundImage: AssetImage("assets/Subhash_Palekar.jpg"),
-                radius: 25.0,
-              ),
-            ),
-            SizedBox(width: 15.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+    child: Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0,top: 4.0),
+      child: Card(
+        elevation: 6,
+        child: Container(
+          padding: const EdgeInsets.only(top: 8.0,bottom: 8.0,left: 12.0,right: 12.0),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  height: 70.0,
+                  width: 70.0,
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage("assets/Subhash_Palekar.jpg"),
+                    radius: 25.0,
                   ),
-                  SizedBox(height: 5.0),
-                  Text(
-                      singer,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+                SizedBox(width: 15.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: Colors.purple[700],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 5.0),
+                      Text(
+                          singer,
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.red[700],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                getMyWidget(progress,onPressed,fileList,selectedIndex,index,title),
+              ],
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xff7c94b6),
+            image: new DecorationImage(
+              fit: BoxFit.cover,
+              colorFilter:
+              ColorFilter.mode(Colors.black.withOpacity(0.2),
+                  BlendMode.dstATop),
+              image: AssetImage('assets/veganicfarming.png'),
             ),
-            getMyWidget(progress,onPressed,fileList,selectedIndex,index,title),
-          ],
+          ),
+        ),
       ),
     ),
   );
@@ -104,8 +121,9 @@ Widget ShowEmptyIcon() {
 
 Widget ShowDefaultIcon(onPressed){
   return Padding(
-      padding:  const EdgeInsets.only(right: 10.0),
+      padding:  const EdgeInsets.only(right: 1.0),
     child: IconButton(
+      color: Colors.red[800],
         icon: Icon(Icons.download),
         onPressed: onPressed
     ),
@@ -115,7 +133,7 @@ Widget ShowDefaultIcon(onPressed){
 
 Widget circularPercentageBar(int progress){
   return Padding(
-    padding: const EdgeInsets.all(10.0),
+    padding: const EdgeInsets.all(1.0),
     child: new CircularPercentIndicator(
       radius: 40.0,
       lineWidth: 3.0,
@@ -124,13 +142,13 @@ Widget circularPercentageBar(int progress){
       center: Text(
         progress.toString() + "%",
         style: TextStyle(
-            fontSize: 10.0,
-            fontWeight: FontWeight.w600,
-            color: Colors.white),
+            fontSize: 13.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.red[900]),
       ),
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.blueGrey,
       circularStrokeCap: CircularStrokeCap.round,
-      progressColor: Colors.redAccent,
+      progressColor: Colors.red,
     ),
   );
 }

@@ -1,6 +1,6 @@
+
 import 'package:SPNF/src/ui/video/list_detail_page.dart';
 import 'package:SPNF/utils/widgets.dart';
-import 'package:auto_route/src/router/auto_router_x.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -67,8 +67,7 @@ class _MyYoutubeVideoPageState extends State<MyYoutubeVideoPage> {
       }
     });
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(4.0),
+      body: Container(
         child: Column(
           children: [
             for (int i = 0; i < filterList.length; i++)
@@ -78,12 +77,21 @@ class _MyYoutubeVideoPageState extends State<MyYoutubeVideoPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => ListDetailPage(
+                              videoTitle : filterList[i]['heading'],
                               listHeading: filterList[i]['list']
                           ),
                       ),
                   ),
               ),
           ],
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xff7c94b6),
+          image: new DecorationImage(
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.dstATop),
+            image: new NetworkImage('https://images.unsplash.com/photo-1622310505762-a813a1c2e0bf?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Z3JlZW4lMjBjb2xvdXJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80',),
+          ),
         ),
       ),
     );

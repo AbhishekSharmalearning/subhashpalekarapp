@@ -1,9 +1,9 @@
 import 'package:SPNF/src/ui/audio/my_audio_list.dart';
 import 'package:SPNF/src/ui/video/my_youtube_video_page.dart';
-import 'package:auto_route/auto_route.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -94,7 +94,7 @@ class _MultimediaListState extends State<MultimediaList> {
         extendBody: true,
         appBar: AppBar(
           backgroundColor: Colors.green[900],
-          title: Text('SPNF'),
+          title: Text('SPNF Training'),
           centerTitle: true,
           actions: [
             PopupMenuButton<String>(
@@ -113,7 +113,9 @@ class _MultimediaListState extends State<MultimediaList> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
           showSelectedLabels: true,
+          selectedItemColor: Colors.red,
           showUnselectedLabels: false,
+          backgroundColor: Colors.green[900],
 
           items: [
             BottomNavigationBarItem(
@@ -124,7 +126,7 @@ class _MultimediaListState extends State<MultimediaList> {
               label: 'Video',
               activeIcon: Icon(
                 Icons.video_collection,
-                color: Colors.green,
+                color: Colors.red,
               ),
             ),
             BottomNavigationBarItem(
@@ -135,7 +137,7 @@ class _MultimediaListState extends State<MultimediaList> {
               label: 'Audio',
               activeIcon: Icon(
                 Icons.audiotrack,
-                color: Colors.green,
+                color: Colors.red,
               ),
             ),
           ],
